@@ -131,40 +131,57 @@ class _MyAppState extends State<MyApp> {
                   children: <Widget>[
                     Expanded(
                         child: Stack(children: <Widget>[
-                      PageView.builder(
-                          controller: _pageController,
-                          itemCount: 2,
-                          itemBuilder: (context, position) {
-                            if (currentPageValue >= 0.5) {
+                          PageView(
+                            controller: _pageController,
+                            physics: BouncingScrollPhysics(),
+                            children: <Widget>[
+                              folderPageWidget(),
+                              allFilesWidget()
+                            ],
+                            onPageChanged:(pageNo){
+                              if (currentPageValue >= 0.5) {
                               allFilesTabColor = ThemeColors.selectedTabColor;
                               foldersTabColor = ThemeColors.white;
                             } else {
                               allFilesTabColor = ThemeColors.white;
                               foldersTabColor = ThemeColors.selectedTabColor;
                             }
-                            if (position == currentPageValue.floor()) {
-                              return Transform(
-                                transform: Matrix4.identity()
-                                  ..rotateX(currentPageValue - position),
-                                child: position % 2 == 0
-                                    ? folderPageWidget()
-                                    : allFilesWidget(),
-                              );
-                            } else if (position ==
-                                currentPageValue.floor() + 1) {
-                              return Transform(
-                                transform: Matrix4.identity()
-                                  ..rotateX(currentPageValue - position),
-                                child: position % 2 == 0
-                                    ? folderPageWidget()
-                                    : allFilesWidget(),
-                              );
-                            } else {
-                              return position % 2 == 0
-                                  ? folderPageWidget()
-                                  : allFilesWidget();
-                            }
-                          }),
+                            },
+                          ),
+                      // PageView.builder(
+                      //     controller: _pageController,
+                      //     itemCount: 2,
+                      //     itemBuilder: (context, position) {
+                      //       if (currentPageValue >= 0.5) {
+                      //         allFilesTabColor = ThemeColors.selectedTabColor;
+                      //         foldersTabColor = ThemeColors.white;
+                      //       } else {
+                      //         allFilesTabColor = ThemeColors.white;
+                      //         foldersTabColor = ThemeColors.selectedTabColor;
+                      //       }
+                      //       if (position == currentPageValue.floor()) {
+                      //         return Transform(
+                      //           transform: Matrix4.identity()
+                      //             ..rotateX(currentPageValue - position),
+                      //           child: position % 2 == 0
+                      //               ? folderPageWidget()
+                      //               : allFilesWidget(),
+                      //         );
+                      //       } else if (position ==
+                      //           currentPageValue.floor() + 1) {
+                      //         return Transform(
+                      //           transform: Matrix4.identity()
+                      //             ..rotateX(currentPageValue - position),
+                      //           child: position % 2 == 0
+                      //               ? folderPageWidget()
+                      //               : allFilesWidget(),
+                      //         );
+                      //       } else {
+                      //         return position % 2 == 0
+                      //             ? folderPageWidget()
+                      //             : allFilesWidget();
+                      //       }
+                      //     }),
                       Container(
                           height: 60,
                           color: Colors.transparent,
