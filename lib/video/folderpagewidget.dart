@@ -112,7 +112,7 @@ class _FolderPageWidgetState extends State<FolderPageWidget> {
             ),
             Expanded(
                 child: Container(
-              margin: EdgeInsets.symmetric(horizontal: 5),
+              margin: EdgeInsets.only(right: 5,top: 10,left: 5),
               child: GridView.count(
                   physics: BouncingScrollPhysics(),
                   crossAxisCount: 3,

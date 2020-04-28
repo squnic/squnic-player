@@ -187,8 +187,8 @@ class _MyAppState extends State<MyApp> {
                                 ),
                               )),
                               Padding(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 10, vertical: 10),
+                                padding: EdgeInsets.only(
+                                    right: 20, left: 10,top:10,bottom: 10),
                                 child: Image.asset(
                                   'assets/3x/menu.png',
                                 ),
