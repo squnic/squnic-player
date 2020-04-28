@@ -48,40 +48,43 @@ class _MyAppState extends State<MyApp> {
 
     _checkPermission().then((granted) {
       if (!granted) return;
-    });
+      if (granted) {
+        VideoFunctions.getVideosList().then((videos) {
+          videoList = videos;
+          count = videoList.length;
+          sortedByRecentVideo = videos;
+          sortedByRecentVideo
+              .sort((a, b) => b.dateAdded.compareTo(a.dateAdded));
+          // print(sortedByRecentVideo[0].thumbnailPath);
+          // print(sortedByRecentVideo[200].dateAdded);
+          // for(int i=0;i<5;i++){
+          //   VideoFunctions.getVideoThumbnail(sortedByRecentVideo[i].path).then((thumb){
+          //     recentThumbnail.add(thumb);
+          //   });
+          // }
+          print(sortedByRecentVideo[0].thumbnailPath);
+        });
+        VideoFunctions.getFolderList().then((list) {
+          setState(() {
+            foldersList = list;
+            folderCount = foldersList.length;
+          });
+        });
 
-    VideoFunctions.getVideosList().then((videos) {
-      videoList = videos;
-      count = videoList.length;
-      sortedByRecentVideo = videos;
-      sortedByRecentVideo.sort((a, b) => b.dateAdded.compareTo(a.dateAdded));
-      // print(sortedByRecentVideo[0].thumbnailPath);
-      // print(sortedByRecentVideo[200].dateAdded);
-      // for(int i=0;i<5;i++){
-      //   VideoFunctions.getVideoThumbnail(sortedByRecentVideo[i].path).then((thumb){
-      //     recentThumbnail.add(thumb);
-      //   });
-      // }
-      print(sortedByRecentVideo[0].thumbnailPath);
-    });
-    VideoFunctions.getFolderList().then((list) {
-      setState(() {
-        foldersList = list;
-        folderCount = foldersList.length;
-      });
-    });
-
-    _pageController.addListener(() {
-      setState(() {
-        currentPageValue = _pageController.page;
-        if (currentPageValue == 1.0) {
-          navigationTracker = navigationConstant;
-        } else if (currentPageValue == 0.0) {
-          navigationTracker = 0;
-        } else {
-          navigationTracker = (navigationConstant * currentPageValue).ceil();
-        }
-      });
+        _pageController.addListener(() {
+          setState(() {
+            currentPageValue = _pageController.page;
+            if (currentPageValue == 1.0) {
+              navigationTracker = navigationConstant;
+            } else if (currentPageValue == 0.0) {
+              navigationTracker = 0;
+            } else {
+              navigationTracker =
+                  (navigationConstant * currentPageValue).ceil();
+            }
+          });
+        });
+      }
     });
   }
 
