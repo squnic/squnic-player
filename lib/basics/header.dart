@@ -6,11 +6,15 @@ import 'colors.dart';
 class WaveHeader extends StatelessWidget {
   final String text;
   final int count;
+  
   const WaveHeader({Key key, @required this.text, @required this.count})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+
+    var colorTheme = ColorTheme();
+
     return Container(
       alignment: Alignment.center,
       child: Stack(
@@ -31,7 +35,7 @@ class WaveHeader extends StatelessWidget {
                   style: TextStyle(
                       fontFamily: 'Roboto',
                       fontWeight: FontWeight.bold,
-                      color: ThemeColors.white,
+                      color: colorTheme.def,
                       fontSize: 25),
                 ),
                 Text(
@@ -39,7 +43,7 @@ class WaveHeader extends StatelessWidget {
                   style: TextStyle(
                       fontFamily: 'Roboto',
                       fontWeight: FontWeight.bold,
-                      color: ThemeColors.white,
+                      color: colorTheme.def,
                       fontSize: 15),
                 ),
                 SizedBox(

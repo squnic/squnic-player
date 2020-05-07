@@ -12,17 +12,19 @@ class InnerGlowWidget extends StatelessWidget {
   final double horizontalMargin;
   final double verticalMargin;
 
+  var colorTheme = ColorTheme();
+
   @override
   Widget build(BuildContext context) {
     return Container(
         margin: EdgeInsets.symmetric(
             horizontal: horizontalMargin, vertical: verticalMargin),
         decoration: BoxDecoration(
-            color: ThemeColors.background,
+            color: colorTheme.background,
             borderRadius: new BorderRadius.circular(5.0),
             boxShadow: <BoxShadow>[
               BoxShadow(
-                color: ThemeColors.innerBlack,
+                color: colorTheme.innerBorder,
                 blurRadius: 3,
                 offset: Offset(0.0, 0.0),
                 spreadRadius: 3,
@@ -36,7 +38,7 @@ class InnerGlowWidget extends StatelessWidget {
               borderRadius: new BorderRadius.circular(5.0),
               boxShadow: <BoxShadow>[
                 BoxShadow(
-                  color: ThemeColors.white.withOpacity(0.06),
+                  color: colorTheme.white.withOpacity(0.06),
                   blurRadius: 10,
                 ),
               ]),

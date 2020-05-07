@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
+
 import 'package:flutter_multimedia_picker/data/MediaFile.dart';
 
 import '../basics/colors.dart';
@@ -8,11 +10,14 @@ import '../basics/header.dart';
 import '../basics/functions.dart';
 
 import '../video/functions.dart';
+import '../video/videoplayer.dart';
 
 class AllFilesWidget extends StatefulWidget {
   final List<MediaFile> videoList;
+  final String title;
+  final int playingIndex;
 
-  AllFilesWidget({Key key, @required this.videoList}) : super(key: key);
+  AllFilesWidget({Key key, @required this.videoList,@required this.title,this.playingIndex=-1}) : super(key: key);
 
   @override
   _AllFilesWidgetState createState() => _AllFilesWidgetState();
@@ -21,6 +26,8 @@ class AllFilesWidget extends StatefulWidget {
 class _AllFilesWidgetState extends State<AllFilesWidget> {
   static int fileCount = 0;
   static List<MediaFile> videoList = [];
+
+  var colorTheme = ColorTheme();
 
   @override
   void initState() {
@@ -32,21 +39,29 @@ class _AllFilesWidgetState extends State<AllFilesWidget> {
 
   @override
   Widget build(BuildContext context) {
+    String title = widget.title;
     return Container(
-      color: ThemeColors.background,
+      color: colorTheme.background,
       child: Column(
         children: <Widget>[
-          WaveHeader(
-            text: 'Files',
+          title!=null?WaveHeader(
+            text: title,
             count: fileCount,
-          ),
+          ):Container(),
           Expanded(
             child: ListView.builder(
               physics: BouncingScrollPhysics(),
               itemCount: fileCount,
               itemBuilder: (BuildContext context, int index) {
+                if(index==widget.playingIndex){
+                  return Container();
+                }
                 return Container(
-                  child: InnerGlowWidget(
+                  child: InkWell(
+                    onTap: (){
+                      Navigator.of(context).push(MaterialPageRoute(builder: (context)=>VideoPlayer(filePath: videoList[index].path,videoList: videoList,index: index,)));
+                    },
+                    child:InnerGlowWidget(
                       horizontalMargin: 10,
                       verticalMargin: 5,
                       child: Padding(
@@ -59,7 +74,7 @@ class _AllFilesWidgetState extends State<AllFilesWidget> {
                                     margin: EdgeInsets.all(10),
                                     width: 70,
                                     height: 50,
-                                    color: ThemeColors.white,
+                                    color: colorTheme.def,
                                   )),
                               Expanded(
                                   child: Column(
@@ -75,7 +90,7 @@ class _AllFilesWidgetState extends State<AllFilesWidget> {
                                               .getFileNameWithoutExtension(
                                                   videoList[index].path),
                                           style: TextStyle(
-                                              color: ThemeColors.green,
+                                              color: colorTheme.primary,
                                               fontWeight: FontWeight.bold,
                                               fontSize: 15),
                                         ),
@@ -90,7 +105,7 @@ class _AllFilesWidgetState extends State<AllFilesWidget> {
                                           BasicFunctions.msToTime(
                                               videoList[index].duration),
                                           style: TextStyle(
-                                              color: ThemeColors.white,
+                                              color: colorTheme.def,
                                               fontWeight: FontWeight.bold,
                                               fontSize: 10),
                                         ),
@@ -109,7 +124,7 @@ class _AllFilesWidgetState extends State<AllFilesWidget> {
                                       BasicFunctions.getFileSizeFromPath(
                                           videoList[index].path),
                                       style: TextStyle(
-                                          color: ThemeColors.white,
+                                          color: colorTheme.def,
                                           fontWeight: FontWeight.bold,
                                           fontSize: 10),
                                     ),
@@ -118,6 +133,7 @@ class _AllFilesWidgetState extends State<AllFilesWidget> {
                               )
                             ],
                           ))),
+                  )
                 );
               },
             ),

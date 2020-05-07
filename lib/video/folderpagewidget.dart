@@ -9,6 +9,9 @@ import '../basics/colors.dart';
 import '../basics/innerglow.dart';
 import '../basics/header.dart';
 
+import '../video/folderfiles.dart';
+import '../video/functions.dart';
+
 class FolderPageWidget extends StatefulWidget {
   int folderCount = 0;
   List<Map<dynamic, dynamic>> foldersList = [];
@@ -29,6 +32,7 @@ class FolderPageWidget extends StatefulWidget {
 
 class _FolderPageWidgetState extends State<FolderPageWidget> {
   static bool showRecentFiles = true;
+  var colorTheme = ColorTheme();
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +43,7 @@ class _FolderPageWidgetState extends State<FolderPageWidget> {
     List<Uint8List> recentThumbnail = widget.recentThumbnail;
 
     return Container(
-        color: ThemeColors.background,
+        color: colorTheme.background,
         child: Column(
           children: <Widget>[
             Container(
@@ -63,7 +67,7 @@ class _FolderPageWidgetState extends State<FolderPageWidget> {
                                       style: TextStyle(
                                           fontFamily: 'Roboto',
                                           fontWeight: FontWeight.bold,
-                                          color: ThemeColors.white,
+                                          color: colorTheme.def,
                                           fontSize: 17),
                                     ),
                                   ),
@@ -72,9 +76,11 @@ class _FolderPageWidgetState extends State<FolderPageWidget> {
                                           alignment: Alignment.centerRight,
                                           child: IconButton(
                                             icon: Icon(
-                                              showRecentFiles?Icons.keyboard_arrow_up:Icons.keyboard_arrow_down,
+                                              showRecentFiles
+                                                  ? Icons.keyboard_arrow_up
+                                                  : Icons.keyboard_arrow_down,
                                             ),
-                                            color: ThemeColors.white,
+                                            color: colorTheme.def,
                                             onPressed: () {
                                               setState(() {
                                                 showRecentFiles =
@@ -85,26 +91,27 @@ class _FolderPageWidgetState extends State<FolderPageWidget> {
                                 ],
                               )),
                           AnimatedContainer(
-                                  height: showRecentFiles?70:0,
-                                  margin: EdgeInsets.only(bottom: showRecentFiles?10:0),
-                                  child: GridView.count(
-                                      crossAxisCount: 5,
-                                      children: List.generate(5, (i) {
-                                        return GridTile(
-                                          child: Container(
-                                            decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(10)),
-                                            child: Card(
-                                                // child: Image.file(File(sortedByRecentVideo[i].path)),
-                                                // child:Text("$i")
-                                                // child: Image.memory(recentThumbnail[i].sublist(0)),
-                                                ),
+                            height: showRecentFiles ? 70 : 0,
+                            margin: EdgeInsets.only(
+                                bottom: showRecentFiles ? 10 : 0),
+                            child: GridView.count(
+                                crossAxisCount: 5,
+                                children: List.generate(5, (i) {
+                                  return GridTile(
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(10)),
+                                      child: Card(
+                                          // child: Image.file(File(sortedByRecentVideo[i].path)),
+                                          // child:Text("$i")
+                                          // child: Image.memory(recentThumbnail[i].sublist(0)),
                                           ),
-                                        );
-                                      })),
-                                  duration: Duration(milliseconds: 500),
-                                ),
+                                    ),
+                                  );
+                                })),
+                            duration: Duration(milliseconds: 500),
+                          ),
                         ],
                       ))
                 ],
@@ -112,7 +119,7 @@ class _FolderPageWidgetState extends State<FolderPageWidget> {
             ),
             Expanded(
                 child: Container(
-              margin: EdgeInsets.only(right: 5,top: 10,left: 5),
+              margin: EdgeInsets.only(right: 5, top: 10, left: 5),
               child: GridView.count(
                   physics: BouncingScrollPhysics(),
                   crossAxisCount: 3,
@@ -120,62 +127,77 @@ class _FolderPageWidgetState extends State<FolderPageWidget> {
                     return GridTile(
                       child: Padding(
                           padding: EdgeInsets.all(2),
-                          child: Card(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              color: Colors.transparent,
-                              child: InnerGlowWidget(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: <Widget>[
-                                    SizedBox(
-                                      height: 10,
-                                    ),
-                                    Container(
-                                      width: 60,
-                                      height: 60,
-                                      child: Image.asset(
-                                        'assets/home/darkfolder.png',
-                                        width: 60,
-                                        height: 60,
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: 10, vertical: 1),
-                                      child: Align(
-                                        alignment: Alignment.center,
-                                        child: Text(
-                                          foldersList[i]['name']
+                          child: InkWell(
+                              onTap: () {
+                                List<MediaFile> folderFiles=[];
+                                VideoFunctions.getFolderFiles(
+                                        foldersList[i]['path']
+                                            .toString())
+                                    .then((videoList) {
+                                  folderFiles = videoList;
+                                });
+                                Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) => FolderFiles(
+                                        folderPath : foldersList[i]['path'].toString(),
+                                        videoList: folderFiles,)));
+                              },
+                              child: Card(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  color: Colors.transparent,
+                                  child: InnerGlowWidget(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: <Widget>[
+                                        SizedBox(
+                                          height: 10,
+                                        ),
+                                        Container(
+                                          width: 60,
+                                          height: 60,
+                                          child: Image.asset(
+                                            'assets/home/darkfolder.png',
+                                            width: 60,
+                                            height: 60,
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 10, vertical: 1),
+                                          child: Align(
+                                            alignment: Alignment.center,
+                                            child: Text(
+                                              foldersList[i]['name']
+                                                          .toString()
+                                                          .length <=
+                                                      13
+                                                  ? foldersList[i]['name']
                                                       .toString()
-                                                      .length <=
-                                                  13
-                                              ? foldersList[i]['name']
-                                                  .toString()
-                                              : foldersList[i]['name']
-                                                      .toString()
-                                                      .substring(0, 10) +
-                                                  "...",
+                                                  : foldersList[i]['name']
+                                                          .toString()
+                                                          .substring(0, 10) +
+                                                      "...",
+                                              style: TextStyle(
+                                                  fontFamily: 'Roboto',
+                                                  fontWeight: FontWeight.bold,
+                                                  color: colorTheme.primary,
+                                                  fontSize: 13),
+                                            ),
+                                          ),
+                                        ),
+                                        Text(
+                                          foldersList[i]['number'],
                                           style: TextStyle(
                                               fontFamily: 'Roboto',
                                               fontWeight: FontWeight.bold,
-                                              color: ThemeColors.textColor,
-                                              fontSize: 13),
+                                              color: colorTheme.primary,
+                                              fontSize: 10),
                                         ),
-                                      ),
+                                      ],
                                     ),
-                                    Text(
-                                      foldersList[i]['number'],
-                                      style: TextStyle(
-                                          fontFamily: 'Roboto',
-                                          fontWeight: FontWeight.bold,
-                                          color: ThemeColors.textColor,
-                                          fontSize: 10),
-                                    ),
-                                  ],
-                                ),
-                              ))),
+                                  )))),
                     );
                   })),
             ))

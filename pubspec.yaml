@@ -26,6 +26,7 @@ dependencies:
   flutter_multimedia_picker: ^1.0.3
   permission_handler: ^5.0.0+hotfix.3
   video_thumbnail: ^0.2.1
+  chewie: ^0.9.10
 
 dev_dependencies:
   flutter_test:

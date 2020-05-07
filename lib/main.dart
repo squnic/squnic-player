@@ -15,20 +15,26 @@ import './video/allfileswidget.dart';
 import './video/folderpagewidget.dart';
 import './video/functions.dart';
 
-Color foldersTabColor = ThemeColors.green;
-Color allFilesTabColor = ThemeColors.white;
+// Color foldersTabColor = ThemeColors.green;
+// Color allFilesTabColor = ThemeColors.white;
 
-void main() => runApp(MaterialApp(
+void main(){
+  // SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp,DeviceOrientation.landscapeLeft,DeviceOrientation.landscapeRight]);
+  runApp(MaterialApp(
       title: "App",
       home: MyApp(),
     ));
-
+}
 class MyApp extends StatefulWidget {
   @override
   _MyAppState createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> {
+  var colorTheme = ColorTheme();
+  Color foldersTabColor;
+  Color allFilesTabColor;
+
   static PageController _pageController = PageController();
   static double currentPageValue = 0.0;
   static int navigationTracker = 0;
@@ -45,6 +51,9 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
+
+    foldersTabColor = colorTheme.primary;
+    allFilesTabColor = colorTheme.def;
 
     _checkPermission().then((granted) {
       if (!granted) return;
@@ -111,43 +120,45 @@ class _MyAppState extends State<MyApp> {
   Widget allFilesWidget() {
     return AllFilesWidget(
       videoList: videoList,
+      title:'All Files',
     );
   }
 
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-      statusBarColor: ThemeColors.background,
+      statusBarColor: colorTheme.background,
     ));
+    // SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     navigationConstant = ((MediaQuery.of(context).size.width - 20) / 2).floor();
     return Scaffold(
         body: SafeArea(
             child: Container(
                 constraints: BoxConstraints.expand(),
                 decoration: BoxDecoration(
-                  color: ThemeColors.background,
+                  color: colorTheme.background,
                 ),
                 child: Column(
                   children: <Widget>[
                     Expanded(
                         child: Stack(children: <Widget>[
-                          PageView(
-                            controller: _pageController,
-                            physics: BouncingScrollPhysics(),
-                            children: <Widget>[
-                              folderPageWidget(),
-                              allFilesWidget()
-                            ],
-                            onPageChanged:(pageNo){
-                              if (currentPageValue >= 0.5) {
-                              allFilesTabColor = ThemeColors.selectedTabColor;
-                              foldersTabColor = ThemeColors.white;
-                            } else {
-                              allFilesTabColor = ThemeColors.white;
-                              foldersTabColor = ThemeColors.selectedTabColor;
-                            }
-                            },
-                          ),
+                      PageView(
+                        controller: _pageController,
+                        physics: BouncingScrollPhysics(),
+                        children: <Widget>[
+                          folderPageWidget(),
+                          allFilesWidget()
+                        ],
+                        onPageChanged: (pageNo) {
+                          if (currentPageValue >= 0.5) {
+                            allFilesTabColor = colorTheme.primary;
+                            foldersTabColor = colorTheme.def;
+                          } else {
+                            allFilesTabColor = colorTheme.def;
+                            foldersTabColor = colorTheme.primary;
+                          }
+                        },
+                      ),
                       // PageView.builder(
                       //     controller: _pageController,
                       //     itemCount: 2,
@@ -205,7 +216,7 @@ class _MyAppState extends State<MyApp> {
                               )),
                               Padding(
                                 padding: EdgeInsets.only(
-                                    right: 20, left: 10,top:10,bottom: 10),
+                                    right: 20, left: 10, top: 10, bottom: 10),
                                 child: Image.asset(
                                   'assets/3x/menu.png',
                                 ),
@@ -216,7 +227,7 @@ class _MyAppState extends State<MyApp> {
                     Container(
                         height: 60,
                         alignment: Alignment.bottomCenter,
-                        color: ThemeColors.background,
+                        color: colorTheme.background,
                         child: InnerGlowWidget(
                           horizontalMargin: 10,
                           verticalMargin: 10,
@@ -302,7 +313,7 @@ class _MyAppState extends State<MyApp> {
                                         2),
                                     height: 3,
                                     decoration: BoxDecoration(
-                                      color: ThemeColors.green,
+                                      color: colorTheme.primary,
                                       borderRadius: BorderRadius.circular(10),
                                     ),
                                   ))

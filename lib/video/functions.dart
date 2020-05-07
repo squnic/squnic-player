@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_multimedia_picker/fullter_multimedia_picker.dart';
 import 'package:flutter_multimedia_picker/data/MediaFile.dart';
+import 'package:testplayer/video/folderfiles.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
 
 class VideoFunctions {
@@ -22,7 +23,7 @@ class VideoFunctions {
     });
   }
 
-  static Future<List> getVideosList() async {
+  static Future<List<MediaFile>> getVideosList() async {
     List<MediaFile> videoMediaFileList =
         await FlutterMultiMediaPicker.getVideo();
 
@@ -110,6 +111,19 @@ class VideoFunctions {
     }
     // return output;
     return folders;
+  }
+
+  static Future<List<MediaFile>> getFolderFiles(folderPath) async {
+    List<MediaFile> folderFiles = [];
+    List<MediaFile> videoList = await FlutterMultiMediaPicker.getVideo();
+
+    for (int i = 0; i < videoList.length; i++) {
+      String path = getFilePath(videoList, i);
+      if(path == folderPath){
+        folderFiles.add(videoList[i]);
+      }
+    }
+    return folderFiles;
   }
 
   // static List<Map<dynamic,dynamic>> getSortedByRecent(List<MediaFile> videoMediaList, int count){
