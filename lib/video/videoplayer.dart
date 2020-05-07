@@ -64,7 +64,7 @@ class _VideoPlayerState extends State<VideoPlayer> {
       allowFullScreen: true,
       allowedScreenSleep: false,
       fullScreenByDefault: false,
-      
+
       // deviceOrientationsAfterFullScreen:[DeviceOrientation.landscapeLeft,DeviceOrientation.landscapeRight],
       // overlay: showPlayerAppBar?playerAppBar():Container(),
     );
@@ -126,7 +126,7 @@ class _VideoPlayerState extends State<VideoPlayer> {
         children: <Widget>[
           Container(
             color: colorTheme.background,
-            child: Expanded(
+            child: Center(
               child: Chewie(
                 controller: _chewieController,
               ),
