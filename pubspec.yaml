@@ -27,6 +27,9 @@ dependencies:
   permission_handler: ^5.0.0+hotfix.3
   video_thumbnail: ^0.2.1
   chewie: ^0.9.10
+  # audio_service: ^0.8.0
+  # audio_focus: ^0.0.1
+  # flutter_sound: ^4.0.4+1
 
 dev_dependencies:
   flutter_test:

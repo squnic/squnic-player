@@ -7,11 +7,14 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_multimedia_picker/data/MediaFile.dart';
 
-import 'package:chewie/chewie.dart';
-import 'package:chewie/src/chewie_player.dart';
+// import 'package:chewie/chewie.dart';
+// import 'package:chewie/src/chewie_player.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+// import 'package:flutter_sound/flutter_sound_player.dart';
 import 'package:video_player/video_player.dart';
+// import 'package:audio_service/audio_service.dart';
+// import 'package:audio_focus/audio_focus.dart';
 
 import '../basics/colors.dart';
 import '../basics/innerglow.dart';
@@ -20,6 +23,9 @@ import '../basics/functions.dart';
 
 import '../video/folderfiles.dart';
 import '../video/functions.dart';
+
+import '../video/chewie.dart';
+import '../video/chewie/videocontrols.dart';
 
 class VideoPlayer extends StatefulWidget {
   final String filePath;
@@ -43,11 +49,29 @@ class _VideoPlayerState extends State<VideoPlayer> {
   ChewieController _chewieController;
   File file;
 
+  // FlutterSoundPlayer flutterSoundPlayer;
+  // AudioFocus audioFocus;
+
   bool showPlayerAppBar=true;
+
+  // Future<int> audioFocus() async {
+  //   flutterSoundPlayer = await FlutterSoundPlayer().initialize();
+  //   if (Platform.isIOS)
+	// 	await flutterSoundPlayer.iosSetCategory( t_IOS_SESSION_CATEGORY.PLAY_AND_RECORD, t_IOS_SESSION_MODE.DEFAULT, IOS_DEFAULT_TO_SPEAKER );
+	// else if (Platform.isAndroid)
+	// 	await flutterSoundPlayer.androidAudioFocusRequest( ANDROID_AUDIOFOCUS_GAIN );
+
+  //   return 1;
+  // }
 
   @override
   void initState() {
     super.initState();
+
+    // audioFocus().then((value) => flutterSoundPlayer.setActive(true));
+    // audioFocus = AudioFocus();
+    // audioFocus;
+    
 
     file = File(widget.filePath);
     _controller = VideoPlayerController.file(file);
@@ -64,10 +88,12 @@ class _VideoPlayerState extends State<VideoPlayer> {
       allowFullScreen: true,
       allowedScreenSleep: false,
       fullScreenByDefault: false,
+      customControls: CustomControls(title:BasicFunctions.getFileNameWithoutExtension(widget.filePath)),
 
       // deviceOrientationsAfterFullScreen:[DeviceOrientation.landscapeLeft,DeviceOrientation.landscapeRight],
       // overlay: showPlayerAppBar?playerAppBar():Container(),
     );
+    
   }
 
   @override
@@ -75,9 +101,51 @@ class _VideoPlayerState extends State<VideoPlayer> {
     // SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     _controller.dispose();
     _chewieController.dispose();
+
+    // flutterSoundPlayer.setActive(false);
+
     super.dispose();
   }
-
+  Widget videoPlayer(){
+    // AudioService.play();
+    // AudioServiceBackground.setState(controls: null, basicState: BasicPlaybackState.playing);
+    // _controller.addListener(() {
+    //   if(_chewieController.isFullScreen==false){
+    //     _chewieController.enterFullScreen();
+    //   }else{
+    //     _chewieController.exitFullScreen();
+    //   }
+    // });
+    return WillPopScope(child: Scaffold(
+      body: SafeArea(
+          child: GestureDetector(
+            onTap: (){
+              setState(() {
+                showPlayerAppBar=!showPlayerAppBar;
+              });
+              print('tapped');
+            },
+            child:Stack(
+        children: <Widget>[
+          Container(
+            color: colorTheme.background,
+            child: Center(
+              child: Chewie(
+                controller: _chewieController,
+              ),
+            ),
+          ),
+          // playerAppBar(),
+        ],
+      )
+          )),
+    ), onWillPop: (){
+      if(_chewieController.videoPlayerController.value.isPlaying){
+        _chewieController.videoPlayerController.pause();
+      }
+      return Future.value(true);
+    });
+  }
   Widget playerAppBar(){
     // Timer(Duration(seconds: 5), (){
     //   setState(() {
@@ -113,29 +181,6 @@ class _VideoPlayerState extends State<VideoPlayer> {
   @override
   Widget build(BuildContext context) {
     // SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft,DeviceOrientation.landscapeRight]);
-    return Scaffold(
-      body: SafeArea(
-          child: GestureDetector(
-            onTap: (){
-              setState(() {
-                showPlayerAppBar=!showPlayerAppBar;
-              });
-              print('tapped');
-            },
-            child:Stack(
-        children: <Widget>[
-          Container(
-            color: colorTheme.background,
-            child: Center(
-              child: Chewie(
-                controller: _chewieController,
-              ),
-            ),
-          ),
-          playerAppBar(),
-        ],
-      )
-          )),
-    );
+    return videoPlayer();
   }
 }
