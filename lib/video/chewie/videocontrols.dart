@@ -28,12 +28,19 @@ class _CustomControlsState extends State<CustomControls> {
   Timer _showAfterExpandCollapseTimer;
   bool _dragging = false;
   bool _displayTapped = false;
+
   bool _showSwipeSeek = false;
   bool _showSwipeGestures = false;
+  bool _showPlus10 = false;
+  bool _showMinus10 = false;
 
-  int _swipeSeek=0;
+  int forwardTap = 0;
+  int backwardTap = 0;
 
-  final barHeight = 48.0;
+  int _swipeSeek = 0;
+
+  final barHeight = 30.0;
+  final appBarHeight = 50.0;
   final marginSize = 5.0;
 
   VideoPlayerController controller;
@@ -64,121 +71,267 @@ class _CustomControlsState extends State<CustomControls> {
         _cancelAndRestartTimer();
       },
       child: GestureDetector(
-        onTap: (){
+        onTap: () {
           _cancelAndRestartTimer();
           setState(() {
-            _showSwipeGestures=false;
-            _showSwipeSeek=false;
+            _showSwipeGestures = !_showSwipeGestures;
+            _showSwipeSeek = false;
           });
         },
-        onDoubleTap: () {
-          if (controller.value.isPlaying) {
-            controller.pause();
-          } else {
-            controller.play();
-          }
-          setState(() {
-            _showSwipeGestures=false;
-            _showSwipeSeek=false;
-          });
-        },
-        onVerticalDragUpdate: (DragUpdateDetails details){
-          // setState(() {
-          //   _showSwipeGestures=true;
-          // });
-          // Timer(Duration(milliseconds: 300), (){
-          // setState(() {
-          //   _showSwipeGestures=false;
-          // });
-        // });
-        },
-        onHorizontalDragUpdate: (DragUpdateDetails details){
-          if (!controller.value.initialized) {
-          return;
-        }
-        controller.seekTo(controller.value.position+Duration(seconds: details.primaryDelta.round()));
-          _swipeSeek = controller.value.position.inSeconds;
-        setState(() {
-          _showSwipeGestures=true;
-          _showSwipeSeek = true;
-        });
+        // onDoubleTap: () {
+        //   // if (controller.value.isPlaying) {
+        //   //   controller.pause();
+        //   // } else {
+        //   //   controller.play();
+        //   // }
+        //   // setState(() {
+        //   //   _showSwipeGestures=false;
+        //   //   _showSwipeSeek=false;
+        //   // });
+        //   if (!controller.value.initialized) {
+        //     return;
+        //   }
 
-        Timer(Duration(milliseconds: 300), (){
-          setState(() {
-            _showSwipeGestures=false;
-            _showSwipeSeek=false;
-          });
-        });
-        
+        //   //   setState(() {
+        //   //   _showSwipeGestures=true;
+        //   //   _showSwipeSeek = true;
+        //   // });
+
+        //   // Timer(Duration(milliseconds: 300), (){
+        //   //   setState(() {
+        //   //     _showSwipeGestures=false;
+        //   //     _showSwipeSeek=false;
+        //   //   });
+        //   // });
+        // },
+        // onVerticalDragUpdate: (DragUpdateDetails details) {
+        //   // setState(() {
+        //   //   _showSwipeGestures=true;
+        //   // });
+        //   // Timer(Duration(milliseconds: 300), (){
+        //   // setState(() {
+        //   //   _showSwipeGestures=false;
+        //   // });
+        //   // });
+        // },
+        onHorizontalDragUpdate: (DragUpdateDetails details) {
+          if (!controller.value.initialized) {
+            return;
+          }
+          controller.seekTo(controller.value.position +
+              Duration(seconds: details.primaryDelta.round()));
+          if (details.primaryDelta.round() > 0) {
+            _swipeSeek = controller.value.position.inSeconds;
+            setState(() {
+              _showSwipeGestures = true;
+              _showSwipeSeek = true;
+              _hideStuff=false;
+            });
+
+            Timer(Duration(milliseconds: 300), () {
+              if(_showSwipeSeek){
+                setState(() {
+                _showSwipeSeek = false;
+              });
+              }
+            });
+          }
         },
         child: AbsorbPointer(
-          absorbing: _hideStuff,
-          child: Stack(children: <Widget>[
-            Column(
-            children: <Widget>[
-              chewieController.isFullScreen
-                  ? _buildAppBar(context)
-                  : SafeArea(child: _buildAppBar(context)),
-              Expanded(
-                child: GestureDetector(
-                  // onDoubleTap: (){
-                  //   if(controller.value.isPlaying){
-                  //     controller.pause();
-                  //   }else{
-                  //     controller.play();
-                  //   }
-                  // },
-                  child: _latestValue != null &&
-                              !_latestValue.isPlaying &&
-                              _latestValue.duration == null ||
-                          _latestValue.isBuffering
-                      ? const Expanded(
-                          child: const Center(
-                            child: const CircularProgressIndicator(),
-                          ),
-                        )
-                      : _buildHitArea(),
+            absorbing: _hideStuff,
+            child: Stack(
+              children: <Widget>[
+                Column(
+                  children: <Widget>[
+                    chewieController.isFullScreen
+                        ? _buildAppBar(context)
+                        : SafeArea(child: _buildAppBar(context)),
+                     _latestValue != null &&
+                                    !_latestValue.isPlaying &&
+                                    _latestValue.duration == null ||
+                                _latestValue.isBuffering
+                            ?  const Expanded(child: const Center(
+                                  child: const CircularProgressIndicator(),
+                                ) ,) 
+                            : _buildHitArea(),
+                    _buildBottomBar(context),
+                  ],
                 ),
-              ),
-              _buildBottomBar(context),
-            ],
-          ),
-          _showSwipeGestures?Container(
-            constraints: BoxConstraints.expand(),
-            child: _showSwipeSeek?Center(
-              child: Container(
-                color:colorTheme.background.withOpacity(0.5),
-                padding: EdgeInsets.symmetric(horizontal: 10,vertical: 5),
-                child: Text('['+_swipeSeek.toString()+'s]',style:TextStyle(color: colorTheme.white,fontSize: 30)),
-              ),
-            ):Row(children: <Widget>[
-              Expanded(
-                flex: 1,
-                child: GestureDetector(
-                  onVerticalDragUpdate: (DragUpdateDetails details){
-
-                  },
-                  child: Center(
-                    child: Text('Brightness'),
-                  ),
-                )),
-                Expanded(
-                flex: 1,
-                child: GestureDetector(
-                  onVerticalDragUpdate: (DragUpdateDetails details){
-                    if (!controller.value.initialized) {
-          return;
-        } 
-                    controller.setVolume(controller.value.volume+details.primaryDelta.round());
-                  },
-                  child: Center(
-                    child: Text('Volume - ${controller.value.volume}',style: TextStyle(color:colorTheme.white,fontSize:30),),
-                  ),
-                )),
-            ],),
-          ):Container(),
-          ],)
-        ),
+                Container(
+                        constraints: BoxConstraints.expand(),
+                        color:colorTheme.white.withOpacity(0.5),
+                        margin: EdgeInsets.only(top: appBarHeight,bottom: barHeight*2),
+                        child: Stack(
+                          children: <Widget>[
+                            _showSwipeSeek
+                                ? Center(
+                                    child: Container(
+                                      color: colorTheme.background
+                                          .withOpacity(0.5),
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 10, vertical: 5),
+                                      child: Text(
+                                          '[' + _swipeSeek.toString() + 's]',
+                                          style: TextStyle(
+                                              color: colorTheme.white,
+                                              fontSize: 30)),
+                                    ),
+                                  )
+                                : Container(),
+                            Row(
+                              mainAxisSize: MainAxisSize.max,
+                              children: <Widget>[
+                                Expanded(
+                                    flex: 1,
+                                    child: Container(
+                                      // color: colorTheme.white.withOpacity(0.5),
+                                      child: GestureDetector(
+                                        behavior: HitTestBehavior.translucent,
+                                        onTap: (){
+                                          print('Minus Tapped');
+                                          setState(() {
+                                            _hideStuff=!_hideStuff;
+                                            _showSwipeGestures=false;
+                                          });
+                                          // _cancelAndRestartTimer();
+                                        },
+                                        onDoubleTap: () {
+                                          if (!controller.value.initialized) {
+                                            return;
+                                          }
+                                          print('[-10s]');
+                                          setState(() {
+                                            _showMinus10 = true;
+                                            _showPlus10 = false;
+                                          });
+                                          if (controller
+                                                  .value.position.inSeconds >
+                                              10) {
+                                            controller.seekTo(Duration(
+                                                seconds: controller.value
+                                                        .position.inSeconds -
+                                                    10));
+                                          } else {
+                                            controller
+                                                .seekTo(Duration(seconds: 0));
+                                          }
+                                          backwardTap+=1;
+                                            Timer(Duration(seconds: 2),(){
+                                              if(!_showPlus10){
+                                                forwardTap =0;
+                                                backwardTap=0;
+                                              }
+                                            });
+                                            Timer(Duration(seconds: 3), () {
+                                              if(_showMinus10){
+                                                setState(() {
+                                                _showMinus10 = false;
+                                                _showPlus10 = false;
+                                              });
+                                              }
+                                            });
+                                        },
+                                        child: Center(
+                                          child: _showMinus10
+                                              ? Container(
+                                                  color: colorTheme.background
+                                                      .withOpacity(0.5),
+                                                  padding: EdgeInsets.symmetric(
+                                                      horizontal: 10,
+                                                      vertical: 5),
+                                                  child: Text(
+                                                    '[-${backwardTap*10}s]',
+                                                    style: TextStyle(
+                                                        color: colorTheme.white,
+                                                        fontSize: 30),
+                                                  ),
+                                                )
+                                              : Container(),
+                                        ),
+                                      ),
+                                    )),
+                                Expanded(
+                                    flex: 1,
+                                    child: Container(
+                                        // color:
+                                        //     colorTheme.white.withOpacity(0.5),
+                                        child: GestureDetector(
+                                                    onVerticalDragUpdate: (DragUpdateDetails details){
+                                                      if (!controller.value.initialized) {
+                                            return;
+                                          }
+                                                      controller.setVolume(_latestVolume+(details.primaryDelta.round()/10));
+                                                    },
+                                          behavior: HitTestBehavior.translucent,
+                                          onTap: (){
+                                          print('Plus Tapped');
+                                          setState(() {
+                                            _hideStuff=!_hideStuff;
+                                            _showSwipeGestures=false;
+                                          });
+                                          // _cancelAndRestartTimer();
+                                        },
+                                          onDoubleTap: () {
+                                            if (!controller.value.initialized) {
+                                              return;
+                                            }
+                                            print('[+10s]');
+                                            setState(() {
+                                              _showMinus10 = false;
+                                              _showPlus10 = true;
+                                            });
+                                            if (controller
+                                                    .value.position.inSeconds <
+                                                controller.value.duration
+                                                        .inSeconds -
+                                                    10) {
+                                              controller.seekTo(Duration(
+                                                  seconds: controller.value
+                                                          .position.inSeconds +
+                                                      10));
+                                            }
+                                            forwardTap+=1;
+                                            Timer(Duration(seconds: 2),(){
+                                              if(!_showPlus10){
+                                                forwardTap =0;
+                                                backwardTap=0;
+                                              }
+                                            });
+                                            Timer(Duration(seconds: 3), () {
+                                              if(_showPlus10){
+                                                setState(() {
+                                                _showMinus10 = false;
+                                                _showPlus10 = false;
+                                              });
+                                              }
+                                            });
+                                          },
+                                          child: Center(
+                                            child: _showPlus10
+                                                ? Container(
+                                                    color: colorTheme.background
+                                                        .withOpacity(0.5),
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                            horizontal: 10,
+                                                            vertical: 5),
+                                                    child: Text(
+                                                      '[+${forwardTap*10}s]',
+                                                      style: TextStyle(
+                                                          color:
+                                                              colorTheme.white,
+                                                          fontSize: 30),
+                                                    ),
+                                                  )
+                                                : Container(),
+                                          ),
+                                        ))),
+                              ],
+                            ),
+                          ],
+                        ))
+              ],
+            )),
       ),
     );
   }
@@ -225,7 +378,9 @@ class _CustomControlsState extends State<CustomControls> {
                 icon: Icon(Icons.arrow_back),
                 color: colorTheme.white,
                 onPressed: () {
-                  chewieController.exitFullScreen();
+                  if(chewieController.isFullScreen){
+                    chewieController.exitFullScreen();
+                  }
                   if (chewieController.isFullScreen) {
                     print('\n\n\nFull Screen ...\n\n\n');
                     chewieController.exitFullScreen();
@@ -334,23 +489,35 @@ class _CustomControlsState extends State<CustomControls> {
           color: Colors.transparent,
           child: Center(
             child: AnimatedOpacity(
-              opacity:
-                  _latestValue != null && !_latestValue.isPlaying && !_dragging
-                      ? 1.0
-                      : 0.0,
+              opacity: _hideStuff ? 0.0 : 1.0,
               duration: Duration(milliseconds: 300),
               child: GestureDetector(
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).dialogBackgroundColor,
-                    borderRadius: BorderRadius.circular(48.0),
-                  ),
-                  child: Padding(
-                    padding: EdgeInsets.all(12.0),
-                    child: Icon(Icons.play_arrow, size: 32.0),
-                  ),
+                  child: Center(
+                child: Row(
+                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 50),
+                      alignment: Alignment.centerLeft,
+                      child: IconButton(
+                          icon: Icon(Icons.skip_previous),
+                          color: colorTheme.white,
+                          iconSize: 50,
+                          onPressed: () {}),
+                    ),
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 50),
+                      alignment: Alignment.centerRight,
+                      child: IconButton(
+                          icon: Icon(Icons.skip_next),
+                          color: colorTheme.white,
+                          iconSize: 50,
+                          onPressed: () {}),
+                    ),
+                  ],
                 ),
-              ),
+              )),
             ),
           ),
         ),
@@ -527,6 +694,7 @@ class _CustomControlsState extends State<CustomControls> {
     _hideTimer = Timer(const Duration(seconds: 3), () {
       setState(() {
         _hideStuff = true;
+        _showSwipeGestures = true;
       });
     });
   }
