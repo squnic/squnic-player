@@ -159,7 +159,6 @@ class _CustomControlsState extends State<CustomControls> {
                 ),
                 Container(
                         constraints: BoxConstraints.expand(),
-                        color:colorTheme.white.withOpacity(0.5),
                         margin: EdgeInsets.only(top: appBarHeight,bottom: barHeight*2),
                         child: Stack(
                           children: <Widget>[
