@@ -31,12 +31,14 @@ class VideoPlayer extends StatefulWidget {
   final String filePath;
   final List<MediaFile> videoList;
   final int index;
-  VideoPlayer(
-      {Key key,
-      @required this.filePath,
-      @required this.videoList,
-      @required this.index})
-      : super(key: key);
+  final bool isNetwork;
+  VideoPlayer({
+    Key key,
+    @required this.filePath,
+    this.index,
+    this.videoList,
+    this.isNetwork = false,
+  }) : super(key: key);
 
   @override
   _VideoPlayerState createState() => _VideoPlayerState();
@@ -52,14 +54,14 @@ class _VideoPlayerState extends State<VideoPlayer> {
   // FlutterSoundPlayer flutterSoundPlayer;
   // AudioFocus audioFocus;
 
-  bool showPlayerAppBar=true;
+  bool showPlayerAppBar = true;
 
   // Future<int> audioFocus() async {
   //   flutterSoundPlayer = await FlutterSoundPlayer().initialize();
   //   if (Platform.isIOS)
-	// 	await flutterSoundPlayer.iosSetCategory( t_IOS_SESSION_CATEGORY.PLAY_AND_RECORD, t_IOS_SESSION_MODE.DEFAULT, IOS_DEFAULT_TO_SPEAKER );
-	// else if (Platform.isAndroid)
-	// 	await flutterSoundPlayer.androidAudioFocusRequest( ANDROID_AUDIOFOCUS_GAIN );
+  // 	await flutterSoundPlayer.iosSetCategory( t_IOS_SESSION_CATEGORY.PLAY_AND_RECORD, t_IOS_SESSION_MODE.DEFAULT, IOS_DEFAULT_TO_SPEAKER );
+  // else if (Platform.isAndroid)
+  // 	await flutterSoundPlayer.androidAudioFocusRequest( ANDROID_AUDIOFOCUS_GAIN );
 
   //   return 1;
   // }
@@ -71,10 +73,16 @@ class _VideoPlayerState extends State<VideoPlayer> {
     // audioFocus().then((value) => flutterSoundPlayer.setActive(true));
     // audioFocus = AudioFocus();
     // audioFocus;
-    
 
-    file = File(widget.filePath);
-    _controller = VideoPlayerController.file(file);
+    if (widget.isNetwork) {
+      print('network url ' + widget.filePath);
+      print('decoded url ' + Uri.decodeFull(widget.filePath));
+      _controller =
+          VideoPlayerController.network(Uri.decodeFull(widget.filePath));
+    } else {
+      file = File(widget.filePath);
+      _controller = VideoPlayerController.file(file);
+    }
     // _controller = new VideoPlayerController.network(
     //   'https://github.com/flutter/assets-for-api-docs/blob/master/assets/videos/butterfly.mp4?raw=true',
     // );
@@ -88,12 +96,13 @@ class _VideoPlayerState extends State<VideoPlayer> {
       allowFullScreen: true,
       allowedScreenSleep: false,
       fullScreenByDefault: false,
-      customControls: CustomControls(title:BasicFunctions.getFileNameWithoutExtension(widget.filePath)),
+      customControls: CustomControls(
+          title: BasicFunctions.getFileNameWithoutExtension(
+              Uri.decodeFull(widget.filePath))),
 
       // deviceOrientationsAfterFullScreen:[DeviceOrientation.landscapeLeft,DeviceOrientation.landscapeRight],
       // overlay: showPlayerAppBar?playerAppBar():Container(),
     );
-    
   }
 
   @override
@@ -106,7 +115,8 @@ class _VideoPlayerState extends State<VideoPlayer> {
 
     super.dispose();
   }
-  Widget videoPlayer(){
+
+  Widget videoPlayer() {
     // AudioService.play();
     // AudioServiceBackground.setState(controls: null, basicState: BasicPlaybackState.playing);
     // _controller.addListener(() {
@@ -116,66 +126,67 @@ class _VideoPlayerState extends State<VideoPlayer> {
     //     _chewieController.exitFullScreen();
     //   }
     // });
-    return WillPopScope(child: Scaffold(
-      body: SafeArea(
-          child: GestureDetector(
-            onTap: (){
-              setState(() {
-                showPlayerAppBar=!showPlayerAppBar;
-              });
-              print('tapped');
-            },
-            child:Stack(
-        children: <Widget>[
-          Container(
-            color: colorTheme.background,
-            child: Center(
-              child: Chewie(
-                controller: _chewieController,
-              ),
-            ),
-          ),
-          // playerAppBar(),
-        ],
-      )
-          )),
-    ), onWillPop: (){
-      if(_chewieController.videoPlayerController.value.isPlaying){
-        _chewieController.videoPlayerController.pause();
-      }
-      return Future.value(true);
-    });
+    return WillPopScope(
+        child: Scaffold(
+          body: SafeArea(
+              child: GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      showPlayerAppBar = !showPlayerAppBar;
+                    });
+                    print('tapped');
+                  },
+                  child: Stack(
+                    children: <Widget>[
+                      Container(
+                        color: colorTheme.background,
+                        child: Center(
+                          child: Chewie(
+                            controller: _chewieController,
+                          ),
+                        ),
+                      ),
+                      // playerAppBar(),
+                    ],
+                  ))),
+        ),
+        onWillPop: () {
+          if (_chewieController.videoPlayerController.value.isPlaying) {
+            _chewieController.videoPlayerController.pause();
+          }
+          return Future.value(true);
+        });
   }
-  Widget playerAppBar(){
+
+  Widget playerAppBar() {
     // Timer(Duration(seconds: 5), (){
     //   setState(() {
     //     showPlayerAppBar=false;
     //   });
     // });
     return Row(
-            mainAxisSize: MainAxisSize.max,
+      mainAxisSize: MainAxisSize.max,
+      children: <Widget>[
+        Expanded(
+            child: Container(
+          color: colorTheme.background.withOpacity(showPlayerAppBar ? 0.4 : 0),
+          child: Row(
             children: <Widget>[
-              Expanded(
-                  child: Container(
-                    color: colorTheme.background.withOpacity(showPlayerAppBar?0.4:0),
-                child: Row(
-                  children: <Widget>[
-                    BackButton(
-                      color: colorTheme.white,
-                    ),
-                    Text(
-                      BasicFunctions.getFileNameWithoutExtension(
-                          widget.filePath),
-                      style: TextStyle(
-                          color: colorTheme.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15),
-                    ),
-                  ],
-                ),
-              ))
+              BackButton(
+                color: colorTheme.white,
+              ),
+              Text(
+                BasicFunctions.getFileNameWithoutExtension(widget.filePath),
+                style: TextStyle(
+                    color: colorTheme.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15),
+              ),
             ],
-          );
+          ),
+        ))
+      ],
+    );
   }
 
   @override

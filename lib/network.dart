@@ -6,6 +6,7 @@ import './basics/colors.dart';
 import './basics/innerglow.dart';
 
 import './network/host.dart';
+import './network/join.dart';
 
 class NetworkHome extends StatelessWidget {
   const NetworkHome({Key key}) : super(key: key);
@@ -64,7 +65,12 @@ class _UserSelectionState extends State<UserSelection> {
                     MaterialPageRoute(builder: (context) => NetworkHost()));
               },
               child: cardContainer('Host')),
-          GestureDetector(onTap: () {}, child: cardContainer('Join')),
+          GestureDetector(
+              onTap: () {
+                Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => NetworkJoin()));
+              },
+              child: cardContainer('Join')),
         ],
       ),
     );

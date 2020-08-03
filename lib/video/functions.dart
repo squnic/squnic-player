@@ -23,6 +23,16 @@ class VideoFunctions {
     });
   }
 
+  static Future<MediaFile> getFirstVideo() async {
+    List<MediaFile> videoMediaFileList =
+        await FlutterMultiMediaPicker.getVideo();
+
+    videoList = videoMediaFileList;
+    count = videoMediaFileList.length;
+
+    return videoMediaFileList[0];
+  }
+
   static Future<List<MediaFile>> getVideosList() async {
     List<MediaFile> videoMediaFileList =
         await FlutterMultiMediaPicker.getVideo();
@@ -112,6 +122,7 @@ class VideoFunctions {
     // return output;
     return folders;
   }
+  
 
   static Future<List<MediaFile>> getFolderFiles(folderPath) async {
     List<MediaFile> folderFiles = [];

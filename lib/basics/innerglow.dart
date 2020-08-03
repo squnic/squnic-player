@@ -38,7 +38,7 @@ class InnerGlowWidget extends StatelessWidget {
               borderRadius: new BorderRadius.circular(5.0),
               boxShadow: <BoxShadow>[
                 BoxShadow(
-                  color: colorTheme.white.withOpacity(0.06),
+                  color: colorTheme.def.withOpacity(0.06),
                   blurRadius: 10,
                 ),
               ]),
