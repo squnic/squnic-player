@@ -1,6 +1,12 @@
-# testplayer
+# Squnic player
 
-A new Flutter project.
+A local media player app which can also host the media in the local network for other users to view the media directly without downloading to their device. The other users can just connect from the app directly or from the web with the url provided from the host app (considered all the devices are connected in local network).
+
+The app lists all the media available on their device in folders tab / All media in a single tab / Recently viewed media tab with respective sort and view options.
+
+The app shows thumbnails and metadata like size, length, name etc alongside the media.
+
+Users can either host a media or join a network for viewing media at a time.
 
 ## Getting Started
 
